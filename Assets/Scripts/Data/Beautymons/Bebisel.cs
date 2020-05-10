@@ -1,37 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 
-abstract public class Potus : Beautymon
+abstract public class Bebisel : Beautymon
 {
-    public Potus(List<Move> newMoves, Talent newTalent) : base(newMoves, newTalent)
+    public Bebisel(List<Move> newMoves, Talent newTalent) : base(newMoves, newTalent)
     {}
 
     public override List<Type> getTypes()
     {
-        return new List<Type>() { new Fire() };
+        return new List<Type>() { new Ice() };
     }
     
     public override List<Move> getPossibleMoves()
     {
         return new List<Move>() {
-            new Ember(),
             new Growl(),
+            new FallingIce(),
             new Howl(),
             new ObstinateStrike(),
             new Scratch(),
-            new Zenith(),
         };
     }
 
     public override List<Talent> getPossibleTalents()
     {
-        return new List<Talent>(){ new FlameBody(), new FlashFire() };
+        return new List<Talent>(){ new Sturdy() };
     }
 
-    // Compared to https://bulbapedia.bulbagarden.net/wiki/Torchic_(Pok%C3%A9mon)#Base_stats
     public override int getMaxHp()
     {
-        return 55;
+        return 60;
     }
 
     public override int getAttack()
@@ -41,21 +39,21 @@ abstract public class Potus : Beautymon
 
     public override int getDefense()
     { 
-        return 40;
+        return 45;
     }
 
     public override int getSpecialAttack()
     {
-        return 50;
+        return 55;
     }
 
     public override int getSpecialDefense()
     {
-        return 40;
+        return 45;
     }
 
     public override int getSpeed()
     {
-        return 55;
+        return 40;
     }
 }

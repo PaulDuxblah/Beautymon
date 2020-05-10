@@ -3,6 +3,17 @@ using System.Collections.Generic;
 
 abstract public class Beautymon
 {
+    public Beautymon(List<Move> newMoves, Talent newTalent)
+    {
+        foreach (Move move in newMoves) {
+            if (!canLearnMove(move)) throw new System.Exception("Incorrect move!: " + move.getName());
+        }
+        moves = newMoves;
+
+        if (!canHaveTalent(newTalent)) throw new System.Exception("Incorrect talent!: " + newTalent.getName());
+        talent = newTalent;
+    }
+
     public static string MAXHP = "HP";
     public static string ATTACK = "Attack";
     public static string DEFENSE = "Defense";
@@ -111,6 +122,16 @@ abstract public class Beautymon
 
         // Sturdy
         if (currentHp == 0 && wasFullHP && talent is Sturdy) currentHp = 1;
+    }
+
+    public bool canLearnMove(Move move)
+    {
+        return getPossibleMoves().Contains(move);
+    }
+
+    public bool canHaveTalent(Talent talent)
+    {
+        return getPossibleTalents().Contains(talent);
     }
 
     public bool canBeAffectedByMove(Move move)

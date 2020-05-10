@@ -86,7 +86,6 @@ public class Combat : MonoBehaviour
         // Burned
         if (attacker.condition is Burned && move is Physical) moveTotalPower -= moveTotalPower / 2;
 
-
         // Climate
         if (climate is Hail) {
             if (moveType is Ice) moveTotalPower = moveTotalPower * 2;
