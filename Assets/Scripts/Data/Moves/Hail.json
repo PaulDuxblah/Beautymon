@@ -1,0 +1,8 @@
+{
+    "name": "Hail",
+    "description": "The climate changes to Hail for 5 turns.",
+    "type": "Ice",
+
+    "targetsEnemy": false,
+    "invokesClimate": "Hail"
+}

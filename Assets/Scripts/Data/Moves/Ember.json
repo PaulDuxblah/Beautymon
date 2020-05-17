@@ -1,0 +1,8 @@
+{
+    "name": "Ember",
+    "description": "The Beautymon attacks with small flames. Using it twice in a row will cause the target to burn.",
+    "power": 40,
+    "type": "Fire",
+    "inflictsCondition": "Burned",
+    "inflictsConditionModifier": 50
+}

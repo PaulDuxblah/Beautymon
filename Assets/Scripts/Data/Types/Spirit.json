@@ -1,0 +1,6 @@
+{
+    "name": "Spirit",
+    "resistances": ["Mystical", "Spirit"],
+    "weaknesses": ["Evil", "Insect", "Psychic", "Will"],
+    "immunities": ["Normal"]
+}

@@ -1,0 +1,6 @@
+{
+    "name": "Electric",
+    "resistances": ["Air", "Electric", "Steel"],
+    "weaknesses": ["Rock"],
+    "immunities": []
+}

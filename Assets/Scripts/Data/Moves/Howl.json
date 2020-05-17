@@ -1,0 +1,8 @@
+{
+    "name": "Howl",
+    "description": "Raises attack by 2 points.",
+    "type": "Normal",
+    "targetsEnemy": false,
+    "modifiesStat": "ATTACK",
+    "modifiesStatModifier": 2
+}

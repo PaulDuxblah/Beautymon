@@ -1,0 +1,7 @@
+{
+    "name": "Growl",
+    "description": "Lowers the enemy attack by 2 points.",
+    "type": "Normal",
+    "modifiesStat": "ATTACK",
+    "modifiesStatModifier": -2
+}

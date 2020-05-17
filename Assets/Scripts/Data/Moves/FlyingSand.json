@@ -1,0 +1,7 @@
+{
+    "name": "Flying Sand",
+    "description": "The climate changes to Sandstorm for 5 turns.",
+    "type": "Rock",
+    "targetsEnemy": false,
+    "invokesClimate": "Sandstorm"
+}

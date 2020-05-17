@@ -1,8 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 
-abstract public class Talent
+public class Talent
 {
-    abstract public string getName();
-    abstract public string getDescription();
+    public string name;
+    public string description;
+
+    public static Talent load(string talentName)
+    {
+        StreamReader reader = new StreamReader("Assets\\Scripts\\Data\\Talents\\" + talentName.Replace(" ", "") + ".json");
+        string json = reader.ReadToEnd();
+        reader.Close();
+
+        return JsonUtility.FromJson<Talent>(json);
+    }
 }

@@ -1,0 +1,7 @@
+{
+    "name": "Rain Dance",
+    "description": "The climate changes to Rain for 5 turns.",
+    "type": "Water",
+    "targetsEnemy": false,
+    "invokesClimate": "Rain"
+}

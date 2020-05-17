@@ -1,0 +1,7 @@
+{
+    "name": "Zenith",
+    "description": "The climate changes to Sun for 5 turns.",
+    "type": "Fire",
+    "targetsEnemy": false,
+    "invokesClimate": "Sun"
+}

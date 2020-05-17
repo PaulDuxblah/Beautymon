@@ -1,0 +1,6 @@
+{
+    "name": "Insect",
+    "resistances": ["Plant", "Psychic", "Spirit", "Will"],
+    "weaknesses": ["Fire", "Ice", "Rock"],
+    "immunities": []
+}

@@ -1,0 +1,12 @@
+{
+    "name": "Bebisel",
+    "types": ["Ice"],
+    "possibleMoves": ["Growl", "FallinIce", "Howl", "ObstinateStrike", "Scratch"],
+    "possibleTalents": ["Sturdy"],
+    "maxHp": 180,
+    "attack": 70,
+    "defense": 45,
+    "specialAttack": 55,
+    "specialDefense": 45,
+    "speed": 40
+}

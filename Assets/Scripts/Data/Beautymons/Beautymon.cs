@@ -1,19 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 
-abstract public class Beautymon
+public class Beautymon
 {
-    public Beautymon(List<Move> newMoves, Talent newTalent)
-    {
-        foreach (Move move in newMoves) {
-            if (!canLearnMove(move)) throw new System.Exception("Incorrect move!: " + move.getName());
-        }
-        moves = newMoves;
-
-        if (!canHaveTalent(newTalent)) throw new System.Exception("Incorrect talent!: " + newTalent.getName());
-        talent = newTalent;
-    }
-
     public static string MAXHP = "HP";
     public static string ATTACK = "Attack";
     public static string DEFENSE = "Defense";
@@ -21,45 +12,115 @@ abstract public class Beautymon
     public static string SPECIALDEFENSE = "Special Defense";
     public static string SPEED = "Speed";
 
-    abstract public List<Move> getPossibleMoves();
-    public List<Move> moves;
-
-    abstract public List<Talent> getPossibleTalents();
+    public string name;
+    public List<string> possibleMoves = new List<string>();
+    public List<Move> moves = new List<Move>();
+    public List<string> possibleTalents = new List<string>();
     public Talent talent;
-
-    abstract public List<Type> getTypes();
-
-    abstract public int getMaxHp();
-    abstract public int getAttack();
-    abstract public int getDefense();
-    abstract public int getSpecialAttack();
-    abstract public int getSpecialDefense();
-    abstract public int getSpeed();
-
+    public List<Type> types = new List<Type>();
+    public int maxHp;
+    public int attack;
+    public int defense;
+    public int specialAttack;
+    public int specialDefense;
+    public int speed;
     public int currentHp;
     public Dictionary<string, int> temporaryStatModifiers;
-
     public Condition condition;
     public Dictionary<string, int> conditionsCounter;
-
     public bool taunted = false;
     public bool confused = false;
     public bool flashFireBuff = false;
 
+    public static Beautymon load(string beautymonName)
+    {
+        StreamReader reader = new StreamReader("Assets\\Scripts\\Data\\Beautymons\\" + beautymonName + ".json");
+        string json = reader.ReadToEnd();
+        reader.Close();
+        
+        Beautymon beautymon = JsonUtility.FromJson<Beautymon>(json);
+
+        json = json.Replace("{", "").Replace("}", "").Replace("\"", "").Replace("  ", "");
+        string[] jsonArray = json.Split('\n');
+
+        foreach (string line in jsonArray) {
+            string editedLine = Utility.cleanJson(line);
+
+            if (editedLine.Contains("possibleTalents: ")) {
+                editedLine = editedLine.Replace("possibleTalents: [", "").Replace("]", "").Replace("\"", "");
+                string[] editedLineArray = editedLine.Split(',');
+                foreach (string talent in editedLineArray) {
+                    beautymon.possibleTalents.Add(talent.Trim());
+                }
+            } else if (editedLine.Contains("possibleMoves: ")) {
+                editedLine = editedLine.Replace("possibleMoves: [", "").Replace("]", "").Replace("\"", "");
+                string[] editedLineArray = editedLine.Split(',');
+                foreach (string move in editedLineArray) {
+                    beautymon.possibleMoves.Add(move.Trim());
+                }
+            } else if (editedLine.Contains("types: ")) {
+                editedLine = editedLine.Replace("types: [", "").Replace("]", "").Replace("\"", "");
+                string[] editedLineArray = editedLine.Split(',');
+                foreach (string type in editedLineArray) {
+                    if (type.Trim().Length == 0) continue;
+                    beautymon.types.Add(Type.load(type.Trim()));
+                }
+            }
+        }
+
+        beautymon.resetConditionsCounter();
+        beautymon.resetTemporaryStatsModifiers();
+        beautymon.currentHp = beautymon.maxHp;
+
+        return beautymon;
+    }
+
+    public void setMoves(List<string> newMoves)
+    {
+        List<Move> oldMoves = moves;
+        foreach (string move in newMoves) {
+            if (!canLearnMove(move)) {
+                moves = oldMoves;
+                throw new System.Exception("Incorrect move!: " + move);
+            }
+            moves.Add(Move.load(move));
+        }
+    }
+
+    public void setMoves(List<Move> newMoves)
+    {
+        List<string> newMovesNames = new List<string>();
+        foreach (Move move in newMoves) {
+            newMovesNames.Add(move.name);
+        }
+        setMoves(newMovesNames);
+    }
+
+    public void setTalent(Talent newTalent)
+    {
+        setTalent(newTalent.name);
+    }
+
+    public void setTalent(string newTalent)
+    {
+        if (!canHaveTalent(newTalent)) throw new System.Exception("Incorrect talent!: " + newTalent);
+        talent = Talent.load(newTalent);
+    }
+
     public int getStat(string statName)
     {
         if (statName == MAXHP) {
-            return getMaxHp();
+            return maxHp;
         } else if (statName == ATTACK) {
-            return getAttack();
+            return attack;
         } else if (statName == DEFENSE) {
-            return getDefense();
+            return defense;
         } else if (statName == SPECIALATTACK) {
-            return getSpecialAttack();
+            return specialAttack;
         } else if (statName == SPECIALDEFENSE) {
-            return getSpecialDefense();
+            return specialDefense;
         } else if (statName == SPEED) {
-            return getSpeed();
+            return speed;
         }
 
         return 0;
@@ -71,14 +132,14 @@ abstract public class Beautymon
 
         if (temporaryStatModifiers[statName] != 0) {
             if (temporaryStatModifiers[statName] > 0) {
-                statValue = statValue * (1 + (1/2 * temporaryStatModifiers[statName]));
+                statValue = statValue * ((double) 1 + (1/2 * temporaryStatModifiers[statName]));
             } else {
                 // I also did it in one line, but it was so unreadable I kept this version :D
                 int absoluteValueOfTemporaryStatModifier = System.Math.Abs(temporaryStatModifiers[statName]);
                 if (absoluteValueOfTemporaryStatModifier % 2 == 0) {
-                    statValue = statValue * (1 / (1 + (absoluteValueOfTemporaryStatModifier / 2))); // 1/2, 1/3, 1/4 for -2, -4, -6
+                    statValue = statValue * ((double) 1 / (1 + (absoluteValueOfTemporaryStatModifier / 2))); // 1/2, 1/3, 1/4 for -2, -4, -6
                 } else {
-                    statValue = statValue * (2 / (2 + absoluteValueOfTemporaryStatModifier)); // 2/3, 2/5, 2/7 for -1, -3, -5
+                    statValue = statValue * ((double) 2 / (2 + absoluteValueOfTemporaryStatModifier)); // 2/3, 2/5, 2/7 for -1, -3, -5
                 }
             }
         }
@@ -88,7 +149,7 @@ abstract public class Beautymon
 
     public int getStatsSum()
     {
-        return getMaxHp() + getAttack() + getDefense() + getSpecialAttack() + getSpecialDefense() + getSpeed();
+        return maxHp + attack + defense + specialAttack + specialDefense + speed;
     }
 
     public bool isKO()
@@ -100,7 +161,7 @@ abstract public class Beautymon
     {
         int finalHpModifier = (int) System.Math.Truncate(hpModifier);
 
-        // Has to be minimum 1 or -1
+        // Has to be minimum 1 if heal or -1 if damage
         if (finalHpModifier == 0) {
             if (hpModifier < 0) {
                 finalHpModifier = -1;
@@ -114,40 +175,67 @@ abstract public class Beautymon
 
     public void changeHP(int hpModifier)
     {
-        bool wasFullHP = currentHp == getMaxHp();
+        bool wasFullHP = currentHp == maxHp;
 
         currentHp += hpModifier;
-        if (currentHp > getMaxHp()) currentHp = getMaxHp();
+        if (currentHp > maxHp) currentHp = maxHp;
         if (currentHp < 0) currentHp = 0;
 
         // Sturdy
-        if (currentHp == 0 && wasFullHP && talent is Sturdy) currentHp = 1;
+        if (currentHp == 0 && wasFullHP && talent.name == "Sturdy") currentHp = 1;
     }
 
     public bool canLearnMove(Move move)
     {
-        return getPossibleMoves().Contains(move);
+        return canLearnMove(move.name);
+    }
+
+    public bool canLearnMove(string move)
+    {
+        foreach (string possibleMove in possibleMoves) {
+            if (possibleMove == move) return true;
+        }
+
+        return false;
     }
 
     public bool canHaveTalent(Talent talent)
     {
-        return getPossibleTalents().Contains(talent);
+        return canHaveTalent(talent.name);
+    }
+
+    public bool canHaveTalent(string talent)
+    {
+        foreach (string possibleTalent in possibleTalents) {
+            if (possibleTalent == talent) return true;
+        }
+
+        return false;
+    }
+
+    public bool hasType(Type type)
+    {
+        foreach (Type beautymonType in types) {
+            if (beautymonType.name == type.name) return true;
+        }
+
+        return false;
     }
 
     public bool canBeAffectedByMove(Move move)
     {
         // Immunity by type
-        foreach (Type type in getTypes()) {
-            if (type.getImmunities().Contains(move.getType())) return false;
+        foreach (Type type in types) {
+            if (type.IsImmunedAgainst(move.type)) return false;
         }
 
         // Immunity by talent
-        if (talent is FlashFire && move.getType() is Fire) {
+        if ((talent.name == "FlashFire") && (move.type.name == "Fire")) {
             flashFireBuff = true;
             return false;
         }
-        if (talent is WaterAbsorb && move.getType() is Water) {
-            changeHP(getMaxHp() * 0.25);
+        if ((talent.name == "WaterAbsorb") && (move.type.name == "Water")) {
+            changeHP(maxHp * 0.25);
             return false;
         }
 
@@ -168,12 +256,12 @@ abstract public class Beautymon
     public void resetConditionsCounter()
     {
         conditionsCounter = new Dictionary<string, int>() {
-            { new Asleep().getName(), 0 },
-            { new BadlyPoisoned().getName(), 0 },
-            { new Burned().getName(), 0 },
-            { new Frozen().getName(), 0 },
-            { new Paralized().getName(), 0 },
-            { new Poisoned().getName(), 0 },
+            { "Asleep", 0 },
+            { "BadlyPoisoned", 0 },
+            { "Burned", 0 },
+            { "Frozen", 0 },
+            { "Paralized", 0 },
+            { "Poisoned", 0 },
         };
     }
 
@@ -199,13 +287,13 @@ abstract public class Beautymon
 
     public bool isOfType(Type wantedType)
     {
-        return isOfType(wantedType.getName());
+        return isOfType(wantedType.name);
     }
 
     public bool isOfType(string typeName)
     {
-        foreach (Type type in getTypes()) {
-            if (type.getName() == typeName) return true;
+        foreach (Type type in types) {
+            if (type.name == typeName) return true;
         }
 
         return false;
@@ -213,50 +301,50 @@ abstract public class Beautymon
 
     public bool canBeAsleep()
     {
-        return talent is Insomniac;
+        return talent.name == "Insomniac";
     }
 
     public bool canBeBurned()
     {
-        return !isOfType(new Fire().getName());
+        return !isOfType("Fire");
     }
 
     public bool canBeFrozen()
     {
-        return !isOfType(new Ice().getName());
+        return !isOfType("Ice");
     }
 
     public bool canBeParalized()
     {
-        return !isOfType(new Electric().getName());
+        return !isOfType("Electric");
     }
 
     public bool canBePoisoned()
     {
-        return !isOfType(new Poison().getName()) && !isOfType(new Steel().getName());
+        return !isOfType("Poison") && !isOfType("Steel");
     }
 
-    public bool canBeAffectedByCondition(Condition condition)
+    public bool canBeAffectedByCondition(Condition incomingCondition)
     {
         return (
-            (condition is Asleep && !canBeAsleep())
-            || (condition is Burned && !canBeBurned())
-            || (condition is Frozen && !canBeFrozen())
-            || (condition is Paralized && !canBeParalized())
-            || ((condition is Poisoned || condition is BadlyPoisoned) && !canBePoisoned())
+            ((incomingCondition.name == "Asleep") && canBeAsleep())
+            || ((incomingCondition.name == "Burned") && canBeBurned())
+            || ((incomingCondition.name == "Frozen") && canBeFrozen())
+            || ((incomingCondition.name == "Paralized") && canBeParalized())
+            || (((incomingCondition.name == "Poisoned") || (incomingCondition.name == "BadlyPoisoned")) && canBePoisoned())
         );
     }
 
-    public void changeConditionCounter(Condition condition, int modifier, bool force = false)
+    public void changeConditionCounter(Condition incomingCondition, int modifier, bool force = false)
     {
-        if (!canBeAffectedByCondition(condition)) return;
+        if (!canBeAffectedByCondition(incomingCondition)) return;
 
-        if (condition != null && !force) return;
+        if (incomingCondition != null && !force) return;
 
-        conditionsCounter[condition.getName()] += modifier;
+        conditionsCounter[incomingCondition.name] += modifier;
 
-        if (conditionsCounter[condition.getName()] >= 100) {
-            setCondition(condition, force);
+        if (conditionsCounter[incomingCondition.name] >= 100) {
+            setCondition(incomingCondition, force);
             resetConditionsCounter();
         }
     }

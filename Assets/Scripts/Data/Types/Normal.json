@@ -1,0 +1,6 @@
+{
+    "name": "Normal",
+    "resistances": [],
+    "weaknesses": ["Poison"],
+    "immunities": ["Will"]
+}

@@ -1,0 +1,6 @@
+{
+    "name": "Air",
+    "resistances": ["Fire", "Plant", "Poison"],
+    "weaknesses": ["Electric", "Ice", "Rock"],
+    "immunities": []
+}

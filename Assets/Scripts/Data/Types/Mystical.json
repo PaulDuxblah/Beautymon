@@ -1,0 +1,6 @@
+{
+    "name": "Mystical",
+    "resistances": ["Air", "Electric", "Fire", "Ice", "Water"],
+    "weaknesses": ["Mystical", "Spirit", "Will"],
+    "immunities": []
+}

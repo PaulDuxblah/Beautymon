@@ -1,0 +1,12 @@
+{
+    "name": "Potus",
+    "types": ["Fire"],
+    "possibleMoves": ["Ember", "Growl", "Howl", "ObstinateStrike", "Scratch", "Zenith"],
+    "possibleTalents": ["FlameBody", "Flash Fire"],
+    "maxHp": 165,
+    "attack": 70,
+    "defense": 40,
+    "specialAttack": 50,
+    "specialDefense": 40,
+    "speed": 55
+}
